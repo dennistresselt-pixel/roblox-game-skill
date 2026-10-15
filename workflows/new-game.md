@@ -66,6 +66,8 @@ Read `templates/game-scaffold.md` -- this contains the universal base structure 
 - Loading screen
 - Core configuration module
 
+Also read `references/retention-systems.md`. Every game ships with the retention layer (daily streak, quests, playtime gifts, season pass) unless the user explicitly opts out. A game without reasons to return dies after its first week, however good the core loop is.
+
 ### Genre-Specific Load
 
 Read the genre template based on the detected type:
@@ -338,9 +340,10 @@ Follow this dependency chain:
 1. **Constants / Types** (shared modules, no dependencies)
 2. **DataManager** (depends on Constants for schema defaults)
 3. **Genre-specific systems** (depend on DataManager for reading/writing player data)
-4. **Client scripts** (depend on Remotes and shared modules)
-5. **UI controllers** (depend on Remotes and client infrastructure)
-6. **Main bootstrapper** (requires and initializes all server modules)
+4. **Retention layer**: `RetentionConfig`, `RetentionLogic`, `RetentionService`, `RetentionController` from `references/retention-systems.md`. Then add `RetentionService.track(...)` calls to the genre systems (event table in §8.2 of that file), replace the quest pools with genre-specific quests, and register handlers for genre currencies with `setRewardHandler`.
+5. **Client scripts** (depend on Remotes and shared modules)
+6. **UI controllers** (depend on Remotes and client infrastructure)
+7. **Main bootstrapper** (requires and initializes all server modules)
 
 ### Per-System Process
 
@@ -546,6 +549,10 @@ Based on the scope and genre, suggest 4-6 concrete next steps. Tailor suggestion
 - Add sound effects and music
 - Add mobile input support (touch buttons, gesture controls)
 
+**Always suggest (retention is what keeps the game alive after launch):**
+- Run a retention audit (load `workflows/retention-audit.md`) once real players arrive
+- Plan the first season: dates, 30 tiers of rewards, season XP math (§8.4 of `references/retention-systems.md`)
+
 **If Full Vision scope, suggest:**
 - Optimize for mobile (reduce part count, test on low-end devices)
 - Add analytics (track retention, monetization, progression)
@@ -564,6 +571,7 @@ Remind the user they can invoke other workflows:
 > - "Review security" -- I will run a security audit
 > - "Optimize performance" -- I will run a performance audit
 > - "Prepare to publish" -- I will walk through the publish checklist
+> - "Make players come back" -- I will run a retention audit
 
 ---
 

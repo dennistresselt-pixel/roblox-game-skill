@@ -22,8 +22,9 @@ All code uses `.luau` extension, Luau type annotations, and follows production b
 game/
 ├── ServerScriptService/
 │   ├── GameManager.server.luau      -- Game lifecycle: init, load modules, create remotes, game loop
-│   ├── DataManager.server.luau      -- Player data persistence (ProfileService pattern)
-│   └── RemoteHandler.server.luau    -- Centralized remote validation, rate limiting, dispatch
+│   ├── DataManager.luau             -- ModuleScript: player data persistence (ProfileService pattern)
+│   ├── RemoteHandler.luau           -- ModuleScript: remote validation, rate limiting, dispatch
+│   └── RetentionService.luau        -- ModuleScript (optional): streaks, quests, gifts, season pass — see references/retention-systems.md
 ├── ServerStorage/
 │   ├── Modules/                     -- Server-only modules (not visible to clients)
 │   │   └── ItemDefinitions.luau     -- Item/asset data tables, drop rates, pricing
@@ -189,6 +190,11 @@ local Constants = require(ReplicatedStorage.Shared.Constants)
 local DataManager = require(ServerScriptService.DataManager)
 local RemoteHandler = require(ServerScriptService.RemoteHandler)
 
+-- Optional retention layer (daily streaks, quests, playtime gifts, season pass).
+-- Drop RetentionService into ServerScriptService to enable it; see references/retention-systems.md.
+local retentionModule = ServerScriptService:FindFirstChild("RetentionService")
+local RetentionService = if retentionModule then (require :: any)(retentionModule) else nil
+
 local GameManager = {}
 
 local isInitialized = false
@@ -211,11 +217,20 @@ local function createRemoteFolder(): Folder
 end
 
 local function onPlayerAdded(player: Player)
-	-- Load player data (DataManager handles retry/kick on failure)
+	-- Load player data (DataManager handles retry/kick on failure). Yields.
 	DataManager.loadPlayer(player)
+
+	if RetentionService and DataManager.getData(player) then
+		RetentionService.onPlayerLoaded(player)
+	end
 end
 
 local function onPlayerRemoving(player: Player)
+	-- Retention writes LastLogout into the profile, so it must run BEFORE the save
+	if RetentionService then
+		RetentionService.onPlayerRemoving(player)
+	end
+
 	-- Save and release player data
 	DataManager.unloadPlayer(player)
 
@@ -239,6 +254,11 @@ function GameManager.init()
 
 	-- Step 3: Initialize remote handling (creates RemoteEvents, registers handlers)
 	RemoteHandler.init()
+
+	-- Step 3b: Retention layer registers its remotes through RemoteHandler
+	if RetentionService then
+		RetentionService.init()
+	end
 
 	-- Step 4: Connect player lifecycle events
 	Players.PlayerAdded:Connect(onPlayerAdded)
@@ -309,12 +329,12 @@ GameManager.init()
 GameManager.start()
 ```
 
-### DataManager (`ServerScriptService/DataManager.server.luau`)
+### DataManager (`ServerScriptService/DataManager.luau` — ModuleScript)
 
 ```luau
 --!strict
 --[[
-	DataManager.server.luau
+	DataManager.luau (ModuleScript — required by GameManager, so no .server suffix)
 	Player data persistence using the ProfileService pattern.
 
 	Features:
@@ -656,12 +676,12 @@ end
 return DataManager
 ```
 
-### RemoteHandler (`ServerScriptService/RemoteHandler.server.luau`)
+### RemoteHandler (`ServerScriptService/RemoteHandler.luau` — ModuleScript)
 
 ```luau
 --!strict
 --[[
-	RemoteHandler.server.luau
+	RemoteHandler.luau (ModuleScript — required by GameManager, so no .server suffix)
 	Centralized remote event/function validation and dispatch.
 
 	Features:
@@ -1725,6 +1745,10 @@ local Constants = require(ReplicatedStorage.Shared.Constants)
 local DataManager = require(ServerScriptService.DataManager)
 local RemoteHandler = require(ServerScriptService.RemoteHandler)
 
+-- Optional retention layer (see references/retention-systems.md)
+local retentionModule = ServerScriptService:FindFirstChild("RetentionService")
+local RetentionService = if retentionModule then (require :: any)(retentionModule) else nil
+
 local isInitialized = false
 local isRunning = false
 
@@ -1739,9 +1763,15 @@ end
 
 local function onPlayerAdded(player)
 	DataManager.loadPlayer(player)
+	if RetentionService and DataManager.getData(player) then
+		RetentionService.onPlayerLoaded(player)
+	end
 end
 
 local function onPlayerRemoving(player)
+	if RetentionService then
+		RetentionService.onPlayerRemoving(player) -- before the save
+	end
 	DataManager.unloadPlayer(player)
 	RemoteHandler.cleanupPlayer(player)
 end
@@ -1751,6 +1781,9 @@ print("[GameManager] Initializing...")
 createRemoteFolder()
 DataManager.init()
 RemoteHandler.init()
+if RetentionService then
+	RetentionService.init()
+end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
 Players.PlayerRemoving:Connect(onPlayerRemoving)

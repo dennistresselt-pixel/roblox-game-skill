@@ -2,7 +2,8 @@
 name: roblox-game
 description: >
   Expert Roblox game development companion — Luau, Roblox Studio, MCP integration,
-  simulator, tycoon, obby, RPG, horror, battle royale, game design, security, performance.
+  simulator, tycoon, obby, RPG, horror, battle royale, game design, retention (daily streaks,
+  quests, season pass), security, performance.
 user-invocable: true
 ---
 
@@ -51,6 +52,8 @@ Match user intent and load the corresponding files:
 | Gotchas / sharp edges / common bugs | `references/sharp-edges.md` |
 | General Luau question | `references/luau-mastery.md` |
 | Game design question | `references/game-design-roblox.md` |
+| Daily rewards / streaks / quests / battle pass / season pass / playtime rewards / referrals | `references/retention-systems.md` |
+| Players don't come back / low retention / "make it addictive" / engagement | `workflows/retention-audit.md` + `references/retention-systems.md` |
 | Ready to publish | `workflows/publish-checklist.md` |
 | Review monetization | `workflows/monetization-audit.md` |
 | Review code quality | `workflows/code-review.md` |
@@ -106,6 +109,13 @@ local store = DataStoreService:GetDataStore("PlayerData")
 
 > **Never trust the client.** Every RemoteEvent payload is attacker-controlled.
 > Validate type, range, ownership, and cooldown on the server for every request.
+
+### Retention Rule
+
+> **Every game needs a reason to come back tomorrow.** New games ship with the retention
+> layer from `references/retention-systems.md` (daily streak, quests, playtime gifts, season pass).
+> Build compelling loops, never manipulative ones: most players are kids, so no paid streak
+> repairs, no fake scarcity, no guilt messaging. Show odds on paid random items and respect `PolicyService`.
 
 ---
 

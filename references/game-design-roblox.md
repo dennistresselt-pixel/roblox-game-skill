@@ -80,9 +80,11 @@ Primary Loop (feels better) --> cycle repeats
 
 Retention is the single most important metric on Roblox. The algorithm rewards games that bring players back, creating a virtuous cycle of visibility and growth. Day-1 retention (D1) above 30% is good. D7 above 15% is strong. D30 above 5% is exceptional.
 
+> **Implementation:** this section covers the theory. Complete, tested, server-authoritative code for every mechanic below (daily streak with freezes, daily/weekly quests, playtime gifts, season pass, comeback rewards, friend bonus, invite referrals, analytics) is in `references/retention-systems.md`. To diagnose an existing game, use `workflows/retention-audit.md`.
+
 ### Daily Login Rewards
 
-Structure escalating value over consecutive days to punish breaks without being cruel.
+Structure escalating value over consecutive days so the streak feels worth keeping, without punishing players for missing a day.
 
 - **Days 1-3:** Small but useful resources (coins, basic items). Low commitment to start the habit.
 - **Days 4-6:** Moderately valuable rewards (rare materials, mid-tier eggs/crates). The streak starts feeling worth protecting.
@@ -131,7 +133,7 @@ Beyond daily logins, streaks can be applied to many mechanics:
 - **Play streaks** -- consecutive days with at least N minutes played.
 - **Win streaks** -- consecutive victories in competitive modes.
 - **Quest streaks** -- completing daily quests without missing a day.
-- **Streak multipliers** -- each consecutive day increases rewards (1x, 1.2x, 1.5x, 2x, 3x). The accelerating value makes breaking the streak feel increasingly costly.
+- **Streak multipliers** -- each consecutive week increases rewards (1x, 1.25x, 1.5x ... capped at 2x). Bank completed weeks so a missed day costs at most a few days of progress. A streak that can be wiped out in one day turns into anxiety, and anxious players quit.
 
 ---
 

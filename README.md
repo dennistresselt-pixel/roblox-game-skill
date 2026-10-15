@@ -4,8 +4,8 @@ The ultimate Roblox game development Claude Code skill. A self-contained, full-l
 
 ## Stats
 
-- **31 files** | **30,677 lines** | **1.0 MB**
-- 121-line SKILL.md router with lazy-loaded references
+- **33 files** | **33,210 lines** | **1.1 MB**
+- 133-line SKILL.md router with lazy-loaded references
 - 3-mode MCP Studio integration (full/standard/offline)
 
 ## Architecture
@@ -14,8 +14,8 @@ The ultimate Roblox game development Claude Code skill. A self-contained, full-l
 
 ```
 roblox-game/
-├── SKILL.md                    # Router (121 lines, 18 routing paths)
-├── references/                 # 16 deep reference files
+├── SKILL.md                    # Router (133 lines, 21 routing paths)
+├── references/                 # 17 deep reference files
 │   ├── luau-mastery.md
 │   ├── architecture-patterns.md
 │   ├── mcp-orchestration.md
@@ -31,6 +31,7 @@ roblox-game/
 │   ├── animation-vfx.md
 │   ├── multiplayer-networking.md
 │   ├── testing-patterns.md
+│   ├── retention-systems.md    # Daily streaks, quests, gifts, season pass (tested code)
 │   └── sharp-edges.md
 ├── templates/                  # 7 game templates
 │   ├── game-scaffold.md        # Universal base (any genre)
@@ -40,13 +41,14 @@ roblox-game/
 │   ├── genre-rpg.md            # Blox Fruits style
 │   ├── genre-horror.md         # Doors style
 │   └── genre-battle-royale.md  # Battle royale style
-└── workflows/                  # 7 guided workflows
+└── workflows/                  # 8 guided workflows
     ├── new-game.md             # Build a game from scratch
     ├── debug-loop.md           # Iterative MCP debugging
     ├── performance-audit.md    # Performance profiling
     ├── security-audit.md       # Security review
     ├── publish-checklist.md    # Pre-publish verification
     ├── monetization-audit.md   # Revenue optimization
+    ├── retention-audit.md      # Make players come back (D1/D7/D30)
     └── code-review.md          # Code quality review
 ```
 
@@ -82,10 +84,25 @@ Each template includes complete, production-ready Luau code for every core syste
 - **Publish Checklist** — 60+ item pre-launch verification across 10 categories
 - **Monetization Audit** — GamePass, DevProduct, Premium, and Ad optimization
 - **Code Review** — A-F quality rating with specific fixes
+- **Retention Audit** — Score the game's reasons to return at every time scale, then ship the fixes
+
+### Retention Layer (New)
+
+Every game built with this skill ships with a complete, server-authoritative retention layer (`references/retention-systems.md`):
+
+- **Daily login streak**: 7-day calendar scaling +25%/week, earned streak freezes, completed weeks banked (never resets to zero), milestone titles and cosmetics
+- **Daily + weekly quests**: deterministic per player per day (identical on every server), free reroll, daily "sweep" bonus that feeds a weekly quest
+- **Playtime gift ladder**: front-loaded (3 gifts in the first 5 minutes), resets daily, cannot be farmed by rejoining
+- **Season pass**: free track + optional retroactive premium GamePass track
+- **Comeback rewards, friend-in-server bonus, invite referrals, offline earnings** (idle genres)
+- **Complete client UI**: HUD badges and pulses, daily calendar, quest list, season track, toasts, notification opt-in
+- **Analytics**: session, streak, quest, season, economy and onboarding-funnel events
+- 17 unit tests for the pure logic module, and all code type-checks under `--!strict` against the Roblox API
+- Built-in engagement guardrails: no paid streak repair, no fake scarcity, `PolicyService`-aware
 
 ### Deep References
 
-16 reference files covering every aspect of Roblox development:
+17 reference files covering every aspect of Roblox development:
 - Luau language mastery with type system and OOP patterns
 - Game architecture (services, client-server, modules, frameworks)
 - Security hardening (never trust client, validation, rate limiting)

@@ -100,6 +100,22 @@ A comprehensive pre-publish checklist for Roblox games. Work through each catego
 
 ---
 
+## Retention
+
+See `references/retention-systems.md` and `workflows/retention-audit.md`.
+
+- [ ] **Daily reason to return**: daily login streak with visible calendar, earned streak freezes, and no reset to zero.
+- [ ] **Daily + weekly quests**: refresh at a fixed server reset time, are the same on every server, and are tracked server-side.
+- [ ] **First-session rewards**: a new player earns a reward within 60 seconds and completes a quest within 5 minutes.
+- [ ] **Season or long-term goal**: a season pass, collection book, or prestige track gives a goal measured in weeks.
+- [ ] **Tomorrow hook**: the player can see what tomorrow's reward is before leaving.
+- [ ] **Social pull**: friend-in-server bonus and/or invite rewards are implemented.
+- [ ] **Notification opt-in**: `ExperienceNotificationService:PromptOptIn()` is shown at a meaningful moment (not on first join).
+- [ ] **Engagement line respected**: no paid streak repairs, no fake scarcity, no loss/guilt messaging, paid random items show odds and respect `PolicyService`.
+- [ ] **Day rollover tested**: claims, quests and gifts behave correctly across the daily reset, while online and after rejoining.
+
+---
+
 ## Analytics
 
 - [ ] **Key events instrumented** — Critical player actions are tracked with `AnalyticsService` or a custom analytics system:
@@ -109,7 +125,8 @@ A comprehensive pre-publish checklist for Roblox games. Work through each catego
   - Core loop engagement (e.g., items collected, levels completed).
   - Purchase events (what was bought, by whom).
   - Churn indicators (where players leave).
-- [ ] **Funnel tracking** — Key funnels are instrumented (FTUE completion, shop visit to purchase, etc.).
+- [ ] **Funnel tracking** — Key funnels are instrumented (FTUE completion, shop visit to purchase, etc.). Use `AnalyticsService:LogOnboardingFunnelStepEvent` for the first session.
+- [ ] **Retention targets written down** — D1, D7 and average session length goals exist before launch, so the first week's data can be judged against them.
 - [ ] **Error logging** — Script errors are logged with context (player, location, action) for debugging in production.
 - [ ] **Performance metrics** — Server FPS, memory usage, and network stats are monitored or logged.
 
